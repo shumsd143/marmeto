@@ -15,12 +15,18 @@ function user_login(email,password,res){
             }
             else{
                 if(data[0].password===password){
-                    res.status(200)
-                    res.send({'status':'passed','name':data[0].name,'email':data[0].email})
+                    if(data[0].isVerified===true){
+                        res.status(200)
+                        res.send({'status':'passed','name':data[0].name,'email':data[0].email})
+                    }
+                    else{
+                        res.status(400)
+                        res.send({'status':'failed','reason':'email unauthenticated'})    
+                    }
                 }
                 else{
                     res.status(400)
-                    res.send({'status':'failed'})
+                    res.send({'status':'failed','reason':'unauthenticated'})
                 }
             }
         })
@@ -53,14 +59,14 @@ function user_authenticated(email,res){
             res.send({'status':'failed','reason':'server error'})
             return
         }
-        dbclient.db('test').collection('verified_user').insertOne(obj,(error,response)=>{
+        dbclient.db('test').collection('verified_user').updateOne({'email':email},{$set:{'isVerified':true}},(error,response)=>{
             if(error){
                 res.status(500)
                 res.send({'status':'failed','reason':'server error'})
                 return
             }
             res.status(200)
-            res.send({'status':'success','reason':'posted'})
+            res.send({'status':'success','reason':'authenticated'})
             return
         })
     })

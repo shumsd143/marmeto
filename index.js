@@ -40,7 +40,7 @@ app.post('/user',(req,res)=>{
         isVerified:false
     }
     schematic.user_register(senderbody,res)
-    const token=jwt.sign({'email':req.body.email},key)
+    const token=jwt.sign({'email':req.body.email},key,{ expiresIn: 10 * 60 })
     let link='http://localhost:4000/validate/user/'+token
     mailer(req.body.email,link)
 })
